@@ -1,4 +1,4 @@
-﻿# content-project
+# content-project
 
 A Pinterest-style content sharing app: Vue 3 + Vite frontend, Express + MySQL API.
 
@@ -6,7 +6,7 @@ A Pinterest-style content sharing app: Vue 3 + Vite frontend, Express + MySQL AP
 
 1. Install dependencies: `npm install`
 2. Make sure MySQL is running and create the database named in `.env` (`DB_NAME`).
-3. Fill in `.env`:
+3. Copy `.env.example` to `.env` and fill it in:
 
 ```
 PORT=5000
@@ -29,6 +29,11 @@ npm start
 This starts both the API (`http://localhost:5000`) and the frontend (Vite, usually `http://localhost:5173`). The frontend proxies `/api` and `/uploads` to the API, so **both must be running** - `npm run dev` alone starts only the frontend, and login will fail.
 
 Run them separately with `npm run server` and `npm run dev` if you prefer.
+
+## Project structure
+
+- `src/` - the Vue website (screens in `src/components`, shared helpers in `src/utils`)
+- `server/` - the API; see [server/README.md](server/README.md) for the folder map and how a request flows
 
 ## Security notes
 
