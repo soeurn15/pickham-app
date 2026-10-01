@@ -1,50 +1,25 @@
 {
-  "name": "content-project",
-  "version": "0.0.0",
+  "name": "pickham",
+  "version": "1.0.0",
   "private": true,
-  "type": "module",
+  "description": "PicKham - a Pinterest-style content sharing app (Vue 3 frontend, Express + MySQL backend).",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
   "scripts": {
-    "dev": "vite",
-    "server": "node server/index.cjs",
-    "start": "run-p server dev",
-    "build": "run-p type-check \"build-only {@}\" --",
-    "preview": "vite preview",
-    "build-only": "vite build",
-    "type-check": "vue-tsc --build"
-  },
-  "dependencies": {
-    "@tailwindcss/cli": "^4.3.0",
-    "cors": "^2.8.6",
-    "dotenv": "^17.4.2",
-    "express": "^5.2.1",
-    "multer": "^2.2.0",
-    "mysql2": "^3.23.3",
-    "vue": "^3.5.32"
+    "start": "run-p dev:backend dev:frontend",
+    "dev:backend": "npm run dev -w backend",
+    "dev:frontend": "npm run dev -w frontend",
+    "server": "npm run start -w backend",
+    "dev": "npm run dev -w frontend",
+    "build": "npm run build -w frontend",
+    "type-check": "npm run type-check -w frontend"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.3.0",
-    "@tsconfig/node24": "^24.0.4",
-    "@types/node": "^24.12.2",
-    "@vitejs/plugin-vue": "^6.0.6",
-    "@vue/tsconfig": "^0.9.1",
-    "autoprefixer": "^10.5.0",
-    "npm-run-all2": "^8.0.4",
-    "postcss": "^8.5.15",
-    "tailwindcss": "^4.3.0",
-    "typescript": "~6.0.0",
-    "vite": "^8.0.8",
-    "vite-plugin-vue-devtools": "^8.1.1",
-    "vue-tsc": "^3.2.6"
+    "npm-run-all2": "^8.0.4"
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
-  },
-  "description": "This template should help get you started developing with Vue 3 in Vite.",
-  "main": "index.js",
-  "directories": {
-    "test": "tests"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  }
 }

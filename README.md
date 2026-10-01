@@ -1,22 +1,46 @@
-# content-project
+# PicKham
 
-A Pinterest-style content sharing app: Vue 3 + Vite frontend, Express + MySQL API.
+A Pinterest-style content sharing app: post images ("pins"), organise them into boards, and like, favourite and comment on them. Admins manage accounts.
 
-## Setup
+- **Frontend:** Vue 3, Vite, Tailwind CSS (`frontend/`)
+- **Backend:** Express and MySQL (`backend/`)
 
-1. Install dependencies: `npm install`
-2. Make sure MySQL is running and create the database named in `.env` (`DB_NAME`).
-3. Copy `.env.example` to `.env` and fill it in:
+## Project structure
 
 ```
-PORT=5000
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_USER=root
-DB_PASSWORD=your-password
-DB_NAME=content-dabase
-JWT_SECRET=any-long-random-string
+pickham/
+├─ frontend/             The website
+│  ├─ src/
+│  │  ├─ components/     One file per screen or widget
+│  │  ├─ utils/          Shared helpers (toast, download)
+│  │  ├─ assets/         Theme colours and global styles
+│  │  ├─ App.vue         Main state and navigation
+│  │  └─ main.ts         App start-up
+│  ├─ public/            Static files
+│  ├─ index.html
+│  └─ vite.config.ts     Dev server; forwards /api to the backend
+├─ backend/              The API  (see backend/README.md)
+│  ├─ routes/  middleware/  config/  db/  utils/
+│  ├─ index.cjs  app.cjs
+│  ├─ .env               Your private settings (never committed)
+│  └─ .env.example       Template for .env
+├─ package.json          Runs both apps (npm workspaces)
+└─ README.md
 ```
+
+## Setup (first time)
+
+1. Install Node.js 20.19+ and MySQL, and make sure MySQL is running.
+2. Create an empty MySQL database (the default name is `content-dabase`).
+3. Install everything from the project root:
+   ```sh
+   npm install
+   ```
+4. Create your settings file:
+   ```sh
+   copy backend\.env.example backend\.env
+   ```
+   Open `backend/.env` and fill in your MySQL password and a long random `JWT_SECRET`.
 
 Tables are created automatically on first start, with demo data (users `Aqeel`, `Zara Chen`, ... all with password `password`).
 
@@ -26,23 +50,21 @@ Tables are created automatically on first start, with demo data (users `Aqeel`, 
 npm start
 ```
 
-This starts both the API (`http://localhost:5000`) and the frontend (Vite, usually `http://localhost:5173`). The frontend proxies `/api` and `/uploads` to the API, so **both must be running** - `npm run dev` alone starts only the frontend, and login will fail.
+This starts the backend (`http://localhost:5000`) and the website (`http://localhost:5173`, or the next free port) together. The website forwards `/api` and `/uploads` to the backend, so **both must be running**.
 
-Run them separately with `npm run server` and `npm run dev` if you prefer.
+Run them separately if you prefer:
 
-## Project structure
-
-- `src/` - the Vue website (screens in `src/components`, shared helpers in `src/utils`)
-- `server/` - the API; see [server/README.md](server/README.md) for the folder map and how a request flows
+| Command | What it does |
+|---|---|
+| `npm run dev:backend` | API with auto-restart on changes |
+| `npm run dev:frontend` | Website only |
+| `npm run build` | Type-check and build the website into `frontend/dist` |
+| `npm run type-check` | Type-check the website |
 
 ## Security notes
 
 - Passwords are hashed (scrypt). Old plaintext passwords are upgraded on the user's next login.
-- Every `/api` route except login/register needs the bearer token returned at login; `/api/admin/*` also needs the `admin` role.
+- Every `/api` route except login, register and health needs the bearer token returned at login; `/api/admin/*` also needs the `admin` role.
+- Login and sign-up are rate limited.
 - To make a user admin: `UPDATE users SET role = 'admin' WHERE username = 'Aqeel';`
-
-## Build
-
-```sh
-npm run build
-```
+- Change the demo passwords before putting this anywhere public.

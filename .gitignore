@@ -40,7 +40,7 @@ __screenshots__/
 
 # Secrets and uploaded files
 .env
-server/uploads
+backend/uploads
 
 # Local tooling
 .claude/

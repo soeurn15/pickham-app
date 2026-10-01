@@ -1,0 +1,21 @@
+{
+  "name": "pickham-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PicKham API (Express + MySQL)",
+  "main": "index.cjs",
+  "scripts": {
+    "start": "node index.cjs",
+    "dev": "node --watch index.cjs"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "multer": "^2.2.0",
+    "mysql2": "^3.23.3"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  }
+}

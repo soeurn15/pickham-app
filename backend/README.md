@@ -1,12 +1,13 @@
 # Backend (Express + MySQL)
 
-Run it with `npm run server` (or `npm start` to run it together with the website).
-Settings come from `.env` in the project root; copy `.env.example` to get started.
+Run it from the project root with `npm run dev:backend` (auto-restarts on changes) or `npm start` (backend and website together).
+Settings come from `backend/.env`; copy `backend/.env.example` to get started.
 
 ## Folder map
 
 ```
-server/
+backend/
+├─ .env / .env.example  Settings (.env is private and never committed)
 ├─ index.cjs        Entry point: starts the server, then creates missing tables
 ├─ app.cjs          Builds the Express app and wires everything together
 ├─ config/
