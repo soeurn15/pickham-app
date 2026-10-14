@@ -4,7 +4,7 @@
       v-for="toast in toasts"
       :key="toast.id"
       role="status"
-      class="pointer-events-auto flex items-center justify-between gap-3 rounded-lg border px-4 py-3 text-sm shadow-lg"
+      class="animate-scale-up pointer-events-auto flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-sm font-medium shadow-[var(--shadow-lg)] backdrop-blur-xl"
       :class="{
         'border-[var(--panel-border)] bg-[var(--bg-soft)] text-[var(--text)]': toast.type !== 'error',
         'border-red-300 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300': toast.type === 'error'

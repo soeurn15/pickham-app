@@ -1,6 +1,6 @@
 const express = require('express');
-const pool = require('../config/db.cjs');
-const { ownsBoard } = require('../utils/boards.cjs');
+const pool = require('../config/db.js');
+const { ownsBoard } = require('../utils/boards.js');
 
 const router = express.Router();
 

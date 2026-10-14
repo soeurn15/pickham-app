@@ -4,7 +4,7 @@
     @click="$emit('click', pin)"
   >
     <!-- Image Wrapper with Rounded Corners & Premium Shadows -->
-    <div class="relative overflow-hidden w-full rounded-2xl bg-slate-200 dark:bg-zinc-800 shadow-[0_4px_16px_rgba(0,0,0,0.015)] group-hover:shadow-[0_20px_35px_rgba(0,0,0,0.08)] transition-all duration-500 border border-[var(--panel-border)]/10">
+    <div class="relative overflow-hidden w-full rounded-2xl bg-slate-200 dark:bg-zinc-800 shadow-[var(--shadow)] group-hover:shadow-[var(--shadow-lg)] transition-all duration-500 ring-1 ring-inset ring-black/5 dark:ring-white/5">
       <img 
         :src="pin.image_url" 
         :alt="pin.title"
@@ -23,7 +23,8 @@
         <div class="flex items-center justify-between gap-2 w-full">
           <select 
             v-model="selectedBoardId" @click.stop 
-            class="pointer-events-auto flex-1 max-w-[120px] rounded-full bg-black/50 backdrop-blur-md border border-white/10 px-3 py-1.5 text-xs text-white outline-none cursor-pointer hover:bg-black/75 transition"
+            :disabled="!boards.length"
+            class="pointer-events-auto disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-black/50 flex-1 max-w-[130px] truncate rounded-full bg-black/50 backdrop-blur-md border border-white/10 px-3 py-1.5 text-xs text-white outline-none hover:bg-black/75 transition"
           >
             <option :value="null" disabled class="text-black bg-white">{{ boards.length ? 'Choose board' : 'No boards yet' }}</option>
             <option 
@@ -119,7 +120,7 @@
         </div>
         <span 
           v-if="pin.category" 
-          class="rounded-full bg-[var(--panel-border)]/40 px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[var(--text-muted)]"
+          class="rounded-full bg-[var(--accent-soft)] px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[var(--accent)]"
         >
           {{ pin.category }}
         </span>

@@ -25,13 +25,13 @@
         <section v-if="activeView === 'feed'" class="space-y-6">
           
           <!-- Category Filter Chips -->
-          <div class="no-scrollbar flex items-center gap-3 overflow-x-auto pb-2">
-            <button 
-              v-for="cat in categories" 
+          <div class="no-scrollbar flex items-center gap-2.5 overflow-x-auto py-1">
+            <button
+              v-for="cat in categories"
               :key="cat"
               type="button"
-              class="rounded-full px-5 py-2 text-xs font-bold transition-all duration-300 whitespace-nowrap cursor-pointer hover:scale-105 active:scale-95"
-              :class="activeCategory === cat ? 'bg-gradient-to-r from-[var(--accent)] to-teal-400 text-white shadow-lg shadow-emerald-500/15 scale-105' : 'bg-[var(--bg-soft)]/80 backdrop-blur-md text-[var(--text-muted)] border border-[var(--panel-border)] hover:text-[var(--text)] hover:bg-[var(--bg-soft)]'"
+              class="rounded-full px-4 py-1.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap cursor-pointer active:scale-95"
+              :class="activeCategory === cat ? 'bg-[var(--text)] text-[var(--bg)] shadow-md' : 'bg-[var(--bg-soft)] text-[var(--text-muted)] border border-[var(--panel-border)] hover:text-[var(--text)] hover:border-[var(--text-muted)]/40'"
               @click="selectCategory(cat)"
             >
               {{ cat }}
@@ -46,16 +46,20 @@
           </div>
 
           <!-- Main Feed Loading Screen -->
-          <div v-if="isLoading" class="flex flex-col items-center justify-center py-24">
-            <div class="h-12 w-12 rounded-full border-4 border-t-[var(--accent)] border-[var(--panel-border)] animate-spin"></div>
-            <span class="text-xs font-semibold text-[var(--text-muted)] mt-4">Discovering amazing content...</span>
+          <div v-if="isLoading" class="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-5" aria-busy="true" aria-label="Loading pins">
+            <div
+              v-for="(h, i) in [220, 300, 180, 260, 340, 200, 280, 240, 320, 190]"
+              :key="i"
+              class="skeleton mb-5 break-inside-avoid rounded-2xl border border-[var(--panel-border)]"
+              :style="{ height: h + 'px' }"
+            ></div>
           </div>
 
           <!-- Empty Feed State -->
           <div v-else-if="pins.length === 0" class="flex flex-col items-center justify-center py-20 text-center space-y-4">
-            <div class="h-16 w-16 text-[var(--text-muted)] opacity-30">
+            <div class="flex h-20 w-20 items-center justify-center rounded-3xl bg-[var(--accent-soft)] p-5 text-[var(--accent)]">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 00-2.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 19.5h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
               </svg>
             </div>
             <h3 class="text-xl font-bold font-outfit">No pins match your search</h3>
@@ -82,6 +86,7 @@
               @save="savePinToBoard"
             />
           </div>
+          
         </section>
 
         <!-- Board Details View -->
@@ -185,6 +190,7 @@
           <AdminDashboard 
             :current-admin-id="currentUserId" 
             @back-to-feed="navigate('feed')" 
+            @categories-changed="onCategoriesChanged"
           />
         </section>
 
@@ -226,7 +232,21 @@ const activeView = ref<'feed' | 'profile' | 'create' | 'board-detail' | 'admin'>
 // Central States
 const searchText = ref('')
 const activeCategory = ref('All')
-const categories = ['All', 'Nature', 'Architecture', 'Food', 'Travel', 'Animals', 'Tech', 'Other']
+const categories = ref<string[]>(['All'])
+
+async function fetchCategories() {
+  if (!isLoggedIn.value) return
+  try {
+    const response = await fetch('/api/categories')
+    if (!response.ok) return
+    const rows: { name: string }[] = await response.json()
+    categories.value = ['All', ...rows.map(r => r.name)]
+    // A category an admin just deleted can't stay selected
+    if (!categories.value.includes(activeCategory.value)) activeCategory.value = 'All'
+  } catch (err) {
+    console.error(err)
+  }
+}
 
 // Authentication States
 const isLoggedIn = ref(false)
@@ -283,6 +303,7 @@ onMounted(async () => {
 
   if (isLoggedIn.value) {
     await fetchCurrentUser()
+    await fetchCategories()
     await fetchPins()
     await fetchBoards()
   }
@@ -300,6 +321,7 @@ async function handleLoginSuccess(userObj: any) {
   }
 
   navigate('feed')
+  await fetchCategories()
   await fetchPins()
   await fetchBoards()
 }
@@ -338,6 +360,11 @@ async function fetchCurrentUser() {
   } catch (error) {
     console.error('Failed to load user info:', error)
   }
+}
+
+async function onCategoriesChanged() {
+  await fetchCategories()
+  await fetchPins() // deleted categories move their pins to "Other"
 }
 
 async function fetchPins() {

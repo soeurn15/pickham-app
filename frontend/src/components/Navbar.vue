@@ -1,11 +1,11 @@
-﻿<template>
-  <header class="sticky top-0 z-40 w-full px-4 py-3 glass-effect border-b border-[var(--panel-border)] shadow-sm">
-    <div class="mx-auto flex max-w-[1400px] items-center justify-between gap-4">
+<template>
+  <header class="sticky top-0 z-40 w-full px-4 py-3 glass-effect !border-x-0 !border-t-0 !shadow-none">
+    <div class="mx-auto flex max-w-[1400px] items-center justify-between gap-2 sm:gap-4">
       
       <!-- Logo and Brand -->
-      <div class="flex items-center gap-2.5 cursor-pointer" @click="$emit('navigate', 'feed')">
+      <button type="button" class="flex shrink-0 items-center gap-2.5 rounded-lg" aria-label="Avora home" @click="$emit('navigate', 'feed')">
         <!-- Upgraded Gradient squircle logo with custom aperture vector -->
-        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--accent)] text-white">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 text-white shadow-lg shadow-emerald-500/25">
           <svg class="h-5.5 w-5.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
             <circle cx="12" cy="13" r="4" />
@@ -13,24 +13,24 @@
           </svg>
         </div>
         <span class="hidden font-outfit text-2xl font-bold tracking-tight text-[var(--text)] sm:block">
-          Pic<span class="text-[var(--accent)]">Kham</span>
+          Av<span class="text-[var(--accent)]">ora</span>
         </span>
-      </div>
+      </button>
 
       <!-- Navigation Links -->
-      <nav class="hidden items-center gap-1.5 md:flex">
-        <button 
+      <nav class="hidden items-center gap-1 rounded-full border border-[var(--panel-border)] bg-[var(--bg-soft)]/60 p-1 md:flex">
+        <button
           type="button"
-          class="flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition"
-          :class="activeView === 'feed' ? 'bg-[var(--accent)] text-white' : 'text-[var(--text-muted)] hover:bg-[var(--panel-border)]'"
+          class="flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold transition"
+          :class="activeView === 'feed' ? 'bg-[var(--accent)] text-white shadow-sm shadow-emerald-500/30' : 'text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--panel-border)]'"
           @click="$emit('navigate', 'feed')"
         >
           Explore
         </button>
         <button 
           type="button"
-          class="flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition"
-          :class="activeView === 'create' ? 'bg-[var(--accent)] text-white' : 'text-[var(--text-muted)] hover:bg-[var(--panel-border)]'"
+          class="flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold transition"
+          :class="activeView === 'create' ? 'bg-[var(--accent)] text-white shadow-sm shadow-emerald-500/30' : 'text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--panel-border)]'"
           @click="$emit('navigate', 'create')"
         >
           <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -42,8 +42,8 @@
         <button 
           v-if="currentUser.role === 'admin'"
           type="button"
-          class="flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition"
-          :class="activeView === 'admin' ? 'bg-[var(--accent)]/15 text-[var(--accent)]' : 'text-[var(--text-muted)] hover:bg-[var(--panel-border)]'"
+          class="flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold transition"
+          :class="activeView === 'admin' ? 'bg-[var(--accent)] text-white shadow-sm shadow-emerald-500/30' : 'text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--panel-border)]'"
           @click="$emit('navigate', 'admin')"
         >
           Admin Panel
@@ -51,7 +51,7 @@
       </nav>
 
       <!-- Center Search Bar -->
-      <div class="relative flex-1 max-w-[680px]">
+      <div class="relative min-w-0 flex-1 max-w-[680px]">
         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)]">
           <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -62,11 +62,13 @@
           placeholder="Search pins, tags and topics" aria-label="Search pins" 
           :value="searchText"
           @input="handleInput"
-          class="w-full rounded-lg border border-[var(--panel-border)] bg-[var(--bg)] py-2.5 pl-10 pr-10 text-sm text-[var(--text)] outline-none transition placeholder:text-[var(--text-muted)] focus:border-[var(--accent)] focus:bg-[var(--bg-soft)] focus:ring-2 focus:ring-[var(--accent)]/10"
+          class="w-full rounded-full border border-[var(--panel-border)] bg-[var(--bg-soft)]/70 py-2.5 pl-11 pr-10 text-sm text-[var(--text)] outline-none transition placeholder:text-[var(--text-muted)] focus:border-[var(--accent)] focus:bg-[var(--bg-soft)] focus:ring-2 focus:ring-[var(--accent)]/10"
         />
         <!-- Clear query button -->
         <button 
           v-if="searchText" 
+          type="button"
+          aria-label="Clear search"
           @click="clearSearch"
           class="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text)] transition cursor-pointer"
         >
@@ -77,7 +79,7 @@
       </div>
 
       <!-- Action Area: Theme and Profile -->
-      <div class="flex items-center gap-3">
+      <div class="flex shrink-0 items-center gap-0.5 sm:gap-3">
         <!-- Add image icon for mobile -->
         <button 
           type="button"
@@ -110,24 +112,33 @@
         <button 
           type="button"
           @click="$emit('logout')"
-          class="hidden sm:inline-flex whitespace-nowrap h-10 px-4 items-center justify-center rounded-lg border border-[var(--panel-border)] text-sm font-medium text-[var(--text-muted)] hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition cursor-pointer"
-          title="Logout Account"
+          class="flex h-10 w-10 items-center justify-center rounded-full text-[var(--text-muted)] hover:text-red-500 hover:bg-red-500/10 transition cursor-pointer"
+          title="Log out"
+          aria-label="Log out"
         >
-          Log out
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+          </svg>
         </button>
 
-        <!-- User Profile Avatar -->
-        <div 
+        <!-- User Profile Avatar (admin gets an amber ring + badge) -->
+        <button
+          type="button"
           @click="$emit('navigate', 'profile')"
-          class="h-9 w-9 overflow-hidden rounded-full border-2 border-transparent hover:border-[var(--accent)] transition cursor-pointer shadow-sm"
-          title="My Profile"
+          class="relative h-9 w-9 shrink-0 rounded-full ring-2 ring-offset-2 ring-offset-[var(--bg)] transition cursor-pointer hover:ring-[var(--accent)]"
+          :class="currentUser.role === 'admin' ? 'ring-amber-400' : 'ring-[var(--panel-border)]'"
+          :title="currentUser.role === 'admin' ? 'My Profile (Admin)' : 'My Profile'"
         >
-          <img 
-            :src="currentUser.avatar || 'https://ui-avatars.com/api/?name=User&background=random'" 
+          <img
+            :src="currentUser.avatar || 'https://ui-avatars.com/api/?name=User&background=random'"
             :alt="currentUser.username"
-            class="h-full w-full object-cover"
+            class="h-full w-full rounded-full object-cover"
           />
-        </div>
+          <span
+            v-if="currentUser.role === 'admin'"
+            class="absolute -bottom-1 -right-1 rounded-full bg-amber-400 px-1 text-[8px] font-extrabold uppercase leading-4 text-amber-950"
+          >Admin</span>
+        </button>
       </div>
 
     </div>

@@ -1,9 +1,10 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-const pool = require('../config/db.cjs');
-const { upload, UPLOADS_DIR } = require('../middleware/upload.cjs');
-const { ownsBoard } = require('../utils/boards.cjs');
+const pool = require('../config/db.js');
+const { upload, UPLOADS_DIR } = require('../middleware/upload.js');
+const { ownsBoard } = require('../utils/boards.js');
+const { getCategoryNames, FALLBACK_CATEGORY } = require('../utils/categories.js');
 
 const router = express.Router();
 
@@ -139,10 +140,12 @@ router.post('/pins', upload.single('image'), async (req, res) => {
 
     const userId = req.user.id;
     const parsedTags = tags ? tags.toString().split(',').map(t => t.trim()).join(', ') : 'creative';
+    // Unknown (e.g. just-deleted) categories fall back to "Other"
+    const validCategory = (await getCategoryNames()).includes(category) ? category : FALLBACK_CATEGORY;
 
     const [insertResult] = await pool.query(
       'INSERT INTO pins (title, description, image_url, category, tags, user_id) VALUES (?, ?, ?, ?, ?, ?)',
-      [title || 'Untitled Pin', description || '', imageUrl, category || 'Other', parsedTags, userId]
+      [title || 'Untitled Pin', description || '', imageUrl, validCategory, parsedTags, userId]
     );
 
     const pinId = insertResult.insertId;

@@ -1,5 +1,5 @@
 // One shared MySQL connection pool for the whole server.
-require('./env.cjs');
+require('./env.js');
 const mysql = require('mysql2/promise');
 
 const pool = mysql.createPool({

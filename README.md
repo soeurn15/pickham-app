@@ -1,4 +1,4 @@
-# PicKham
+# Avora
 
 A Pinterest-style content sharing app: post images ("pins"), organise them into boards, and like, favourite and comment on them. Admins manage accounts.
 
@@ -8,7 +8,7 @@ A Pinterest-style content sharing app: post images ("pins"), organise them into 
 ## Project structure
 
 ```
-pickham/
+Avora/
 ├─ frontend/             The website
 │  ├─ src/
 │  │  ├─ components/     One file per screen or widget
@@ -21,7 +21,7 @@ pickham/
 │  └─ vite.config.ts     Dev server; forwards /api to the backend
 ├─ backend/              The API  (see backend/README.md)
 │  ├─ routes/  middleware/  config/  db/  utils/
-│  ├─ index.cjs  app.cjs
+│  ├─ index.js  app.js
 │  ├─ .env               Your private settings (never committed)
 │  └─ .env.example       Template for .env
 ├─ package.json          Runs both apps (npm workspaces)

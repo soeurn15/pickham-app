@@ -1,5 +1,5 @@
-const pool = require('../config/db.cjs');
-const { hashPassword } = require('../utils/password.cjs');
+const pool = require('../config/db.js');
+const { hashPassword } = require('../utils/password.js');
 
 // Seed helper function
 async function seedDb() {

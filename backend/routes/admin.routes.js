@@ -1,5 +1,6 @@
 const express = require('express');
-const pool = require('../config/db.cjs');
+const pool = require('../config/db.js');
+const { FALLBACK_CATEGORY, MAX_CATEGORY_LENGTH } = require('../utils/categories.js');
 
 const router = express.Router();
 
@@ -101,6 +102,48 @@ router.delete('/users/:id', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to delete user' });
+  }
+});
+
+// Add a category
+router.post('/categories', async (req, res) => {
+  try {
+    const name = String(req.body?.name ?? '').trim();
+    if (!name) return res.status(400).json({ error: 'Category name is required' });
+    if (name.length > MAX_CATEGORY_LENGTH) {
+      return res.status(400).json({ error: `Category name must be ${MAX_CATEGORY_LENGTH} characters or fewer` });
+    }
+
+    // Names are matched case-insensitively by the column collation
+    const [existing] = await pool.query('SELECT id FROM categories WHERE name = ?', [name]);
+    if (existing.length > 0) return res.status(409).json({ error: 'That category already exists' });
+
+    const [result] = await pool.query('INSERT INTO categories (name) VALUES (?)', [name]);
+    res.status(201).json({ id: result.insertId, name });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to create category' });
+  }
+});
+
+// Delete a category; its pins move to the fallback category so none are orphaned
+router.delete('/categories/:id', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    const [rows] = await pool.query('SELECT name FROM categories WHERE id = ?', [id]);
+    if (rows.length === 0) return res.status(404).json({ error: 'Category not found' });
+
+    const { name } = rows[0];
+    if (name === FALLBACK_CATEGORY) {
+      return res.status(400).json({ error: `"${FALLBACK_CATEGORY}" is the default category and cannot be deleted` });
+    }
+
+    await pool.query('UPDATE pins SET category = ? WHERE category = ?', [FALLBACK_CATEGORY, name]);
+    await pool.query('DELETE FROM categories WHERE id = ?', [id]);
+    res.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to delete category' });
   }
 });
 

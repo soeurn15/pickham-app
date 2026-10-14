@@ -54,7 +54,16 @@
                 :style="{ backgroundImage: `url(${previewUrl})` }" 
                 class="absolute inset-0 bg-cover bg-center scale-110 blur-3xl opacity-20 pointer-events-none"
               ></div>
-              <img :src="previewUrl" alt="Preview" class="h-full w-full object-contain rounded-2xl relative z-10 p-2" />
+              <img :src="previewUrl" alt="Preview" class="h-full w-full object-contain rounded-2xl relative z-10 p-2" @error="onPreviewError" />
+              <button
+                type="button"
+                class="absolute right-3 top-3 z-30 flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur transition hover:bg-red-500 cursor-pointer"
+                title="Remove image"
+                aria-label="Remove image"
+                @click.stop="clearImage"
+              >
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
               <div class="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity duration-200 flex items-center justify-center z-20">
                 <span class="rounded-full bg-white px-5 py-2.5 text-xs font-bold text-slate-800 shadow-lg scale-95 transition duration-200">Swap Photo</span>
               </div>
@@ -83,6 +92,10 @@
           </template>
         </div>
 
+        <p v-if="selectedFile" class="-mt-1 truncate text-center text-[11px] font-medium text-[var(--text-muted)]">
+          {{ selectedFile.name }} · {{ formatSize(selectedFile.size) }}
+        </p>
+
         <!-- URL Input Alternative -->
         <div class="flex flex-col gap-2 mt-2">
           <span class="text-center text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-wider">— OR PASTE AN IMAGE LINK —</span>
@@ -91,7 +104,7 @@
             placeholder="https://images.unsplash.com/your-favorite-photo" 
             v-model="imageUrl"
             @input="handleUrlInput"
-            class="w-full rounded-[20px] border border-transparent bg-slate-50 dark:bg-zinc-900/60 px-4 py-3.5 text-xs text-[var(--text)] outline-none focus:border-[var(--accent)] focus:bg-[var(--bg-soft)] transition-all duration-300"
+            :class="fieldClass"
           />
         </div>
       </div>
@@ -101,16 +114,18 @@
         <!-- Title -->
         <div class="flex flex-col gap-1.5">
           <label class="text-xs font-medium text-[var(--text-muted)]" for="pin-title">
-            Title
+            Title <span class="text-red-500" aria-hidden="true">*</span>
           </label>
           <input 
             id="pin-title"
             type="text" 
             placeholder="Add a catchy visual title" 
             v-model="title"
+            maxlength="100"
             required
-            class="w-full rounded-[20px] border border-transparent bg-slate-50 dark:bg-zinc-900/60 px-4 py-3.5 text-sm font-semibold text-[var(--text)] outline-none focus:border-[var(--accent)] focus:bg-[var(--bg-soft)] transition-all duration-300"
+            :class="fieldClass"
           />
+          <span class="self-end text-[10px] font-medium text-[var(--text-muted)]">{{ title.length }}/100</span>
         </div>
 
         <!-- Description -->
@@ -123,7 +138,9 @@
             placeholder="Describe what people are seeing in this photo..." 
             v-model="description"
             rows="3"
-            class="w-full rounded-[20px] border border-transparent bg-slate-50 dark:bg-zinc-900/60 px-4 py-3.5 text-xs text-[var(--text)] outline-none focus:border-[var(--accent)] focus:bg-[var(--bg-soft)] transition-all duration-300 resize-none"
+            maxlength="500"
+            class="resize-none"
+            :class="fieldClass"
           ></textarea>
         </div>
 
@@ -132,13 +149,15 @@
           <label class="text-xs font-medium text-[var(--text-muted)]" for="pin-category">
             Category
           </label>
+          <div class="relative">
           <select 
             id="pin-category"
             v-model="category"
-            class="w-full rounded-[20px] border border-transparent bg-slate-50 dark:bg-zinc-900/60 px-4 py-3.5 text-xs text-[var(--text)] outline-none focus:border-[var(--accent)] focus:bg-[var(--bg-soft)] transition-all duration-300 cursor-pointer"
+            :class="fieldClass"
           >
             <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
           </select>
+          </div>
         </div>
 
         <!-- Tags -->
@@ -151,8 +170,11 @@
             type="text" 
             placeholder="nature, aesthetic, emerald, background" 
             v-model="tags"
-            class="w-full rounded-[20px] border border-transparent bg-slate-50 dark:bg-zinc-900/60 px-4 py-3.5 text-xs text-[var(--text)] outline-none focus:border-[var(--accent)] focus:bg-[var(--bg-soft)] transition-all duration-300"
+            :class="fieldClass"
           />
+          <div v-if="tagList.length" class="flex flex-wrap gap-1.5 pt-1">
+            <span v-for="t in tagList" :key="t" class="rounded-full bg-[var(--accent)]/10 px-2.5 py-1 text-[11px] font-semibold text-[var(--accent)]">#{{ t }}</span>
+          </div>
         </div>
 
         <!-- Board Selection -->
@@ -160,14 +182,16 @@
           <label class="text-xs font-medium text-[var(--text-muted)]" for="pin-board">
             Add to Board (Optional)
           </label>
+          <div class="relative">
           <select 
             id="pin-board"
             v-model="boardId"
-            class="w-full rounded-[20px] border border-transparent bg-slate-50 dark:bg-zinc-900/60 px-4 py-3.5 text-xs text-[var(--text)] outline-none focus:border-[var(--accent)] focus:bg-[var(--bg-soft)] transition-all duration-300 cursor-pointer"
+            :class="fieldClass"
           >
             <option :value="null">Don't save to a board</option>
             <option v-for="board in boards" :key="board.id" :value="board.id">{{ board.name }}</option>
           </select>
+          </div>
         </div>
 
         <!-- Error feedback -->
@@ -187,8 +211,8 @@
           
           <button 
             type="submit" 
-            :disabled="isSubmitting"
-            class="rounded-full bg-[var(--accent)] px-8 py-2.5 text-xs font-bold text-white transition flex items-center justify-center gap-2 shadow-md shadow-emerald-500/10 cursor-pointer disabled:opacity-50"
+            :disabled="isSubmitting || !canPublish"
+            class="rounded-full bg-[var(--accent)] px-8 py-2.5 text-xs font-bold text-white transition flex items-center justify-center gap-2 shadow-md shadow-emerald-500/10 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
           >
             <svg v-if="isSubmitting" class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -231,7 +255,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 const props = defineProps<{
   categories: string[]
@@ -264,6 +288,31 @@ const dragOver = ref(false)
 const isSubmitting = ref(false)
 const isSuccess = ref(false)
 const errorMsg = ref('')
+
+const fieldClass = 'w-full appearance-none rounded-[20px] border border-transparent bg-slate-50 dark:bg-zinc-900/60 px-4 py-3.5 text-sm text-[var(--text)] outline-none placeholder:text-[var(--text-muted)]/70 focus:border-[var(--accent)] focus:bg-[var(--bg-soft)] focus:ring-4 focus:ring-[var(--accent)]/10 transition-all duration-300'
+
+const tagList = computed(() =>
+  Array.from(new Set(tags.value.split(',').map(t => t.trim()).filter(Boolean))).slice(0, 12)
+)
+const canPublish = computed(() => !!title.value.trim() && (!!selectedFile.value || !!imageUrl.value.trim()))
+
+function formatSize(bytes: number) {
+  return bytes < 1024 * 1024 ? `${Math.round(bytes / 1024)} KB` : `${(bytes / 1024 / 1024).toFixed(1)} MB`
+}
+
+function clearImage() {
+  selectedFile.value = null
+  previewUrl.value = ''
+  imageUrl.value = ''
+  if (fileInput.value) fileInput.value.value = ''
+}
+
+function onPreviewError() {
+  if (!selectedFile.value) {
+    errorMsg.value = 'That link could not be loaded as an image.'
+    previewUrl.value = ''
+  }
+}
 
 function triggerFileSelect() {
   fileInput.value?.click()
@@ -315,9 +364,27 @@ function handleUrlInput() {
   }
 }
 
+function validateForm(): string {
+  if (!title.value.trim()) return 'Title is required.'
+  if (!selectedFile.value && !imageUrl.value.trim()) return 'Please upload a physical image or paste a valid photo URL.'
+  if (!selectedFile.value) {
+    try {
+      const { protocol } = new URL(imageUrl.value.trim())
+      if (protocol !== 'http:' && protocol !== 'https:') return 'Image link must start with http:// or https://.'
+    } catch {
+      return 'Image link is not a valid URL.'
+    }
+  }
+  const rawTags = tags.value.split(',').map(t => t.trim()).filter(Boolean)
+  if (new Set(rawTags).size > 12) return 'Use at most 12 tags.'
+  if (rawTags.some(t => t.length > 30)) return 'Each tag must be 30 characters or fewer.'
+  return ''
+}
+
 async function submitPin() {
-  if (!selectedFile.value && !imageUrl.value.trim()) {
-    errorMsg.value = 'Please upload a physical image or paste a valid photo URL.'
+  const problem = validateForm()
+  if (problem) {
+    errorMsg.value = problem
     return
   }
 

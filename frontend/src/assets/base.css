@@ -1,25 +1,32 @@
 ﻿:root {
-  --bg: #f9fafb; /* Soft neutral light grey background */
+  --bg: #f6f7f9; /* Soft neutral light grey background */
   --bg-soft: #ffffff; /* Pure white content panels */
-  --panel: rgba(255, 255, 255, 0.9);
-  --panel-border: rgba(229, 231, 235, 0.9); /* Slate-200 equivalent */
-  --text: #111827; /* Dark slate text */
-  --text-muted: #4b5563; /* Slate-600 muted text */
+  --panel: rgba(255, 255, 255, 0.78);
+  --panel-border: rgba(226, 229, 235, 0.95);
+  --text: #0f172a; /* Deep slate text */
+  --text-muted: #5b6475; /* Muted slate */
   --accent: #10b981; /* Premium Emerald Green */
   --accent-hover: #059669;
-  --shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+  --accent-soft: rgba(16, 185, 129, 0.12);
+  --glow: rgba(16, 185, 129, 0.10);
+  --shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.05);
+  --shadow-lg: 0 2px 4px rgba(15, 23, 42, 0.04), 0 24px 48px rgba(15, 23, 42, 0.12);
+  --ring: 0 0 0 3px rgba(16, 185, 129, 0.18);
 }
 
 .dark {
-  --bg: #111111; /* Sleek charcoal dark mode */
-  --bg-soft: #1c1c1c; /* Lighter charcoal panels */
-  --panel: rgba(28, 28, 28, 0.9);
-  --panel-border: rgba(44, 44, 44, 0.8);
-  --text: #f3f4f6; /* Off-white text */
-  --text-muted: #9ca3af; /* Gray-400 muted text */
+  --bg: #0c0d10; /* Deep near-black with a cool tint */
+  --bg-soft: #16181d; /* Raised panels */
+  --panel: rgba(18, 20, 24, 0.72);
+  --panel-border: rgba(255, 255, 255, 0.08);
+  --text: #f1f5f9; /* Off-white text */
+  --text-muted: #9aa3b2; /* Cool muted grey */
   --accent: #10b981; /* Consistent brand emerald */
   --accent-hover: #34d399;
-  --shadow: 0 16px 32px rgba(0, 0, 0, 0.45);
+  --accent-soft: rgba(16, 185, 129, 0.16);
+  --glow: rgba(16, 185, 129, 0.12);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 2px 4px rgba(0, 0, 0, 0.5), 0 28px 56px rgba(0, 0, 0, 0.6);
 }
 
 *,
@@ -37,6 +44,9 @@ body {
   margin: 0;
   color: var(--text);
   background-color: var(--bg);
+  /* Soft brand glow at the top so the page isn't a flat slab */
+  background-image: radial-gradient(1100px 420px at 50% -120px, var(--glow), transparent 70%);
+  background-repeat: no-repeat;
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -107,4 +117,52 @@ h1, h2, h3, h4, h5, h6 {
 
 .font-outfit {
   font-family: 'Outfit', sans-serif;
+}
+
+/* Consistent, branded text selection */
+::selection {
+  background: rgba(16, 185, 129, 0.25);
+}
+
+/* Tactile press feedback on buttons */
+button:active:not(:disabled) {
+  transform: translateY(0.5px) scale(0.99);
+}
+
+/* Native selects: one consistent look with a custom chevron */
+select:not([multiple]) {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 7.5l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.65rem center;
+  background-size: 1rem;
+  padding-right: 2.1rem;
+  cursor: pointer;
+  text-overflow: ellipsis;
+}
+
+select:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--ring);
+}
+
+/* Respect users who prefer less motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

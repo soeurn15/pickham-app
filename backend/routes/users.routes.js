@@ -1,6 +1,6 @@
 const express = require('express');
-const pool = require('../config/db.cjs');
-const { publicUser } = require('../utils/user.cjs');
+const pool = require('../config/db.js');
+const { publicUser } = require('../utils/user.js');
 
 const router = express.Router();
 

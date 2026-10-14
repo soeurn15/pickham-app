@@ -80,6 +80,61 @@
       </div>
     </section>
 
+    <!-- Categories -->
+    <section class="rounded-xl border border-[var(--panel-border)] bg-[var(--bg-soft)] p-6">
+      <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div>
+          <h2 class="text-base font-semibold text-[var(--text)]">Categories</h2>
+          <p class="mt-0.5 text-xs text-[var(--text-muted)]">Shown in the feed filter and when creating a pin. Deleting one moves its pins to "Other".</p>
+        </div>
+        <form class="flex w-full gap-2 md:w-auto" @submit.prevent="addCategory">
+          <input
+            v-model="newCategory"
+            type="text"
+            maxlength="50"
+            placeholder="New category name"
+            aria-label="New category name"
+            class="w-full rounded-lg border border-[var(--panel-border)] bg-[var(--bg)] px-3.5 py-2 text-sm text-[var(--text)] outline-none transition focus:border-[var(--accent)] md:w-64"
+          />
+          <button
+            type="submit"
+            :disabled="isAddingCategory || !newCategory.trim()"
+            class="whitespace-nowrap rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          >{{ isAddingCategory ? 'Adding...' : 'Add category' }}</button>
+        </form>
+      </div>
+
+      <p v-if="categoryError" role="alert" class="mt-3 text-xs font-semibold text-red-600 dark:text-red-400">{{ categoryError }}</p>
+
+      <ul class="mt-5 flex flex-wrap gap-2">
+        <li
+          v-for="c in categoryList"
+          :key="c.id"
+          class="flex items-center gap-2 rounded-full border border-[var(--panel-border)] bg-[var(--bg)] py-1.5 pl-3.5 pr-2 text-sm text-[var(--text)]"
+        >
+          <span>{{ c.name }}</span>
+          <span class="tabular text-xs text-[var(--text-muted)]">{{ c.pins_count }}</span>
+          <span v-if="c.name === 'Other'" class="rounded-full bg-[var(--panel-border)] px-2 py-0.5 text-[10px] font-semibold text-[var(--text-muted)]" title="Fallback category, cannot be deleted">default</span>
+          <template v-else>
+            <button
+              v-if="confirmingCategoryId !== c.id"
+              type="button"
+              class="flex h-6 w-6 items-center justify-center rounded-full text-[var(--text-muted)] transition hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30"
+              :aria-label="`Delete category ${c.name}`"
+              @click="confirmingCategoryId = c.id"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <span v-else class="flex items-center gap-1">
+              <button type="button" class="rounded-full bg-red-600 px-2.5 py-0.5 text-xs font-semibold text-white" @click="deleteCategory(c)">Delete{{ c.pins_count ? ` (move ${c.pins_count})` : '' }}</button>
+              <button type="button" class="rounded-full px-2 py-0.5 text-xs text-[var(--text-muted)] hover:text-[var(--text)]" @click="confirmingCategoryId = null">Cancel</button>
+            </span>
+          </template>
+        </li>
+        <li v-if="!categoryList.length" class="text-sm text-[var(--text-muted)]">No categories yet.</li>
+      </ul>
+    </section>
+
     <!-- Accounts table -->
     <section class="overflow-hidden rounded-xl border border-[var(--panel-border)] bg-[var(--bg-soft)]">
       <div class="flex flex-col gap-3 border-b border-[var(--panel-border)] p-5 md:flex-row md:items-center md:justify-between">
@@ -231,8 +286,9 @@ const props = defineProps<{
   currentAdminId: number
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   (event: 'back-to-feed'): void
+  (event: 'categories-changed'): void
 }>()
 
 const PAGE_SIZE = 8
@@ -241,6 +297,13 @@ const metrics = ref<{ users: number; pins: number; boards: number; comments: num
   users: 0, pins: 0, boards: 0, comments: 0, likes: 0, categories: []
 })
 const usersList = ref<any[]>([])
+
+// Categories
+const categoryList = ref<{ id: number; name: string; pins_count: number }[]>([])
+const newCategory = ref('')
+const isAddingCategory = ref(false)
+const categoryError = ref('')
+const confirmingCategoryId = ref<number | null>(null)
 const isLoading = ref(false)
 const loaded = ref(false)
 const errorMsg = ref('')
@@ -320,7 +383,8 @@ async function refresh() {
   isLoading.value = true
   errorMsg.value = ''
   try {
-    const [m, u] = await Promise.all([fetch('/api/admin/metrics'), fetch('/api/admin/users')])
+    const [m, u, c] = await Promise.all([fetch('/api/admin/metrics'), fetch('/api/admin/users'), fetch('/api/categories')])
+    if (c.ok) categoryList.value = await c.json()
     if (!m.ok || !u.ok) {
       throw new Error(m.status === 403 || u.status === 403
         ? 'Your account does not have admin access.'
@@ -333,6 +397,52 @@ async function refresh() {
     errorMsg.value = err.message || 'Could not reach the server.'
   } finally {
     isLoading.value = false
+  }
+}
+
+// Show the server's reason (e.g. "Username is already taken") instead of a generic message
+async function serverError(res: Response, fallback: string) {
+  try {
+    const body = await res.json()
+    return typeof body?.error === 'string' ? body.error : fallback
+  } catch {
+    return fallback
+  }
+}
+
+async function addCategory() {
+  const name = newCategory.value.trim()
+  if (!name) return
+  isAddingCategory.value = true
+  categoryError.value = ''
+  try {
+    const res = await fetch('/api/admin/categories', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name })
+    })
+    if (!res.ok) throw new Error(await serverError(res, 'Could not create the category.'))
+    newCategory.value = ''
+    await refresh()
+    emit('categories-changed')
+  } catch (err: any) {
+    categoryError.value = err.message
+  } finally {
+    isAddingCategory.value = false
+  }
+}
+
+async function deleteCategory(category: { id: number; name: string }) {
+  categoryError.value = ''
+  try {
+    const res = await fetch(`/api/admin/categories/${category.id}`, { method: 'DELETE' })
+    if (!res.ok) throw new Error(await serverError(res, 'Could not delete the category.'))
+    confirmingCategoryId.value = null
+    await refresh()
+    emit('categories-changed')
+  } catch (err: any) {
+    confirmingCategoryId.value = null
+    categoryError.value = err.message
   }
 }
 
@@ -362,7 +472,7 @@ async function toggleUserRole(user: any) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ role: newRole })
     })
-    if (!res.ok) throw new Error('Could not change the role.')
+    if (!res.ok) throw new Error(await serverError(res, 'Could not change the role.'))
     user.role = newRole
   } catch (err: any) {
     errorMsg.value = err.message
@@ -389,7 +499,7 @@ async function saveUserEdit() {
         bio: editBio.value.trim()
       })
     })
-    if (!res.ok) throw new Error('Could not save the profile.')
+    if (!res.ok) throw new Error(await serverError(res, 'Could not save the profile.'))
     showEditModal.value = false
     await refresh()
   } catch (err: any) {
@@ -407,7 +517,7 @@ async function deleteUser() {
   if (!selectedUser.value) return
   try {
     const res = await fetch(`/api/admin/users/${selectedUser.value.id}`, { method: 'DELETE' })
-    if (!res.ok) throw new Error('Could not delete the account.')
+    if (!res.ok) throw new Error(await serverError(res, 'Could not delete the account.'))
     showDeleteModal.value = false
     await refresh()
   } catch (err: any) {

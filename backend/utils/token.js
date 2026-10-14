@@ -1,7 +1,7 @@
 // HMAC-signed session tokens: <userId>.<expiry>.<signature>
 const crypto = require('crypto');
-const { JWT_SECRET } = require('../config/env.cjs');
-const { safeEqual } = require('./password.cjs');
+const { JWT_SECRET } = require('../config/env.js');
+const { safeEqual } = require('./password.js');
 
 const TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 

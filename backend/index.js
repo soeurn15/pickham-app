@@ -1,7 +1,7 @@
 // Entry point: loads settings, starts the HTTP server, then makes sure the database tables exist.
-const { PORT } = require('./config/env.cjs');
-const app = require('./app.cjs');
-const { initDb } = require('./db/schema.cjs');
+const { PORT } = require('./config/env.js');
+const app = require('./app.js');
+const { initDb } = require('./db/schema.js');
 
 app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);

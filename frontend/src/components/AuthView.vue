@@ -1,12 +1,16 @@
-﻿<template>
+<template>
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-[var(--bg)] p-4 overflow-hidden">
     
+    <!-- Ambient brand glow behind the card -->
+    <div class="pointer-events-none absolute -left-24 -top-24 h-96 w-96 rounded-full bg-emerald-500/20 blur-3xl animate-blob-1"></div>
+    <div class="pointer-events-none absolute -bottom-32 -right-24 h-[28rem] w-[28rem] rounded-full bg-teal-400/15 blur-3xl animate-blob-2"></div>
+
     <!-- Auth Card (Premium Glassmorphic container) -->
-    <div class="w-full max-w-[460px] rounded-2xl bg-[var(--bg-soft)] p-8 sm:p-10 border border-[var(--panel-border)] shadow-xl relative z-10">
-      
+    <div class="animate-scale-up w-full max-w-[460px] rounded-3xl bg-[var(--bg-soft)]/90 p-8 sm:p-10 border border-[var(--panel-border)] shadow-[var(--shadow-lg)] backdrop-blur-xl relative z-10">
+
       <!-- Brand Logo Header -->
       <div class="flex flex-col items-center text-center mb-8">
-        <div class="flex h-14 w-14 items-center justify-center rounded-xl bg-[var(--accent)] text-white mb-4">
+        <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-600 text-white mb-4 shadow-lg shadow-emerald-500/30">
           <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
             <circle cx="12" cy="13" r="4" />
@@ -14,7 +18,7 @@
           </svg>
         </div>
         <h1 class="text-3xl font-bold font-outfit tracking-tight text-[var(--text)]">
-          Pic<span class="text-[var(--accent)]">Kham</span>
+          Av<span class="text-[var(--accent)]">ora</span>
         </h1>
         <p class="text-xs text-[var(--text-muted)] mt-1.5 font-semibold">Discover and collect visual inspiration</p>
       </div>
@@ -33,7 +37,7 @@
             placeholder="Your username" autocomplete="username" 
             v-model="username"
             required
-            class="w-full rounded-lg border border-[var(--panel-border)] bg-[var(--bg)] px-3.5 py-2.5 text-sm text-[var(--text)] outline-none focus:border-[var(--accent)] transition"
+            class="w-full rounded-xl border border-[var(--panel-border)] bg-[var(--bg)] px-4 py-3 text-sm text-[var(--text)] outline-none focus:border-[var(--accent)] transition"
           />
         </div>
 
@@ -44,14 +48,14 @@
             placeholder="Your password" autocomplete="current-password" 
             v-model="password"
             required
-            class="w-full rounded-lg border border-[var(--panel-border)] bg-[var(--bg)] px-3.5 py-2.5 text-sm text-[var(--text)] outline-none focus:border-[var(--accent)] transition"
+            class="w-full rounded-xl border border-[var(--panel-border)] bg-[var(--bg)] px-4 py-3 text-sm text-[var(--text)] outline-none focus:border-[var(--accent)] transition"
           />
         </div>
 
         <button 
           type="submit" 
           :disabled="isLoading"
-          class="w-full mt-6 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] py-2.5 text-sm font-semibold text-white transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+          class="w-full mt-6 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-500/25 transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
         >
           <svg v-if="isLoading" class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -70,7 +74,7 @@
             placeholder="Choose a username" autocomplete="username" 
             v-model="username"
             required
-            class="w-full rounded-lg border border-[var(--panel-border)] bg-[var(--bg)] px-3.5 py-2.5 text-sm text-[var(--text)] outline-none focus:border-[var(--accent)] transition"
+            class="w-full rounded-xl border border-[var(--panel-border)] bg-[var(--bg)] px-4 py-3 text-sm text-[var(--text)] outline-none focus:border-[var(--accent)] transition"
           />
         </div>
 
@@ -81,7 +85,7 @@
             placeholder="Create a password" autocomplete="new-password" 
             v-model="password"
             required
-            class="w-full rounded-lg border border-[var(--panel-border)] bg-[var(--bg)] px-3.5 py-2.5 text-sm text-[var(--text)] outline-none focus:border-[var(--accent)] transition"
+            class="w-full rounded-xl border border-[var(--panel-border)] bg-[var(--bg)] px-4 py-3 text-sm text-[var(--text)] outline-none focus:border-[var(--accent)] transition"
           />
         </div>
 
@@ -91,7 +95,7 @@
             type="text" 
             placeholder="Tell us about yourself..." 
             v-model="bio"
-            class="w-full rounded-lg border border-[var(--panel-border)] bg-[var(--bg)] px-3.5 py-2.5 text-sm text-[var(--text)] outline-none focus:border-[var(--accent)] transition"
+            class="w-full rounded-xl border border-[var(--panel-border)] bg-[var(--bg)] px-4 py-3 text-sm text-[var(--text)] outline-none focus:border-[var(--accent)] transition"
           />
         </div>
 
@@ -128,14 +132,14 @@
             type="url" 
             v-model="avatar"
             placeholder="Or paste custom avatar URL" 
-            class="w-full mt-2 rounded-lg border border-[var(--panel-border)] bg-[var(--bg)] px-3.5 py-2.5 text-xs text-[var(--text)] outline-none focus:border-[var(--accent)] transition"
+            class="w-full mt-2 rounded-xl border border-[var(--panel-border)] bg-[var(--bg)] px-4 py-3 text-xs text-[var(--text)] outline-none focus:border-[var(--accent)] transition"
           />
         </div>
 
         <button 
           type="submit" 
           :disabled="isLoading"
-          class="w-full mt-6 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] py-2.5 text-sm font-semibold text-white transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+          class="w-full mt-6 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-500/25 transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
         >
           <svg v-if="isLoading" class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>

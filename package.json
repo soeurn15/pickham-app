@@ -1,8 +1,8 @@
 {
-  "name": "pickham",
+  "name": "avora",
   "version": "1.0.0",
   "private": true,
-  "description": "PicKham - a Pinterest-style content sharing app (Vue 3 frontend, Express + MySQL backend).",
+  "description": "Avora - a Pinterest-style content sharing app (Vue 3 frontend, Express + MySQL backend).",
   "workspaces": [
     "backend",
     "frontend"

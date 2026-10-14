@@ -1,5 +1,6 @@
-const { seedDb } = require('./seed.cjs');
-const pool = require('../config/db.cjs');
+const { seedDb } = require('./seed.js');
+const pool = require('../config/db.js');
+const { FALLBACK_CATEGORY } = require('../utils/categories.js');
 
 // Database and tables setup
 async function initDb() {
@@ -107,6 +108,20 @@ async function initDb() {
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       )
     `);
+
+    // Create categories table (admin-managed; pins reference a category by name)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS categories (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(100) NOT NULL UNIQUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    // Seed the defaults, plus any category already used by an existing pin
+    const defaults = ['Nature', 'Architecture', 'Food', 'Travel', 'Animals', 'Tech', FALLBACK_CATEGORY];
+    const [used] = await pool.query("SELECT DISTINCT category FROM pins WHERE category IS NOT NULL AND category <> ''");
+    const names = [...new Set([...defaults, ...used.map(r => r.category)])];
+    await pool.query('INSERT IGNORE INTO categories (name) VALUES ?', [names.map(n => [n])]);
 
     console.log('MySQL Database tables initialized successfully.');
     

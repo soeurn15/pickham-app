@@ -1,9 +1,9 @@
 {
-  "name": "pickham-frontend",
+  "name": "avora-frontend",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "PicKham website (Vue 3 + Vite + Tailwind CSS)",
+  "description": "Avora website (Vue 3 + Vite + Tailwind CSS)",
   "scripts": {
     "dev": "vite",
     "build": "run-p type-check \"build-only {@}\" --",

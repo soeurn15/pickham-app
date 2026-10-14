@@ -1,6 +1,6 @@
 // requireAuth: valid token -> req.user = { id, username, role }.  requireAdmin: role must be admin.
-const pool = require('../config/db.cjs');
-const { readToken } = require('../utils/token.cjs');
+const pool = require('../config/db.js');
+const { readToken } = require('../utils/token.js');
 
 async function requireAuth(req, res, next) {
   try {

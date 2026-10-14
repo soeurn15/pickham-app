@@ -1,16 +1,16 @@
 ﻿<template>
-  <div class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 p-3 sm:p-6 animate-fade-in" @click.self="$emit('close')">
+  <div class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 backdrop-blur-sm p-3 sm:p-6 animate-fade-in" @click.self="$emit('close')">
     <div
       role="dialog"
       aria-modal="true"
       :aria-label="pin ? pin.title : 'Pin details'"
-      class="relative my-auto w-full max-w-[1100px] overflow-hidden rounded-xl border border-[var(--panel-border)] bg-[var(--bg-soft)] shadow-xl"
+      class="animate-spring-bounce relative my-auto w-full max-w-[1100px] overflow-hidden rounded-3xl border border-[var(--panel-border)] bg-[var(--bg-soft)] shadow-[var(--shadow-lg)]"
     >
       <!-- Close -->
       <button
         type="button"
         @click="$emit('close')"
-        class="absolute right-3 top-3 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-[var(--panel-border)] bg-[var(--bg-soft)] text-[var(--text-muted)] hover:text-[var(--text)]"
+        class="absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-[var(--panel-border)] bg-[var(--bg-soft)]/90 backdrop-blur text-[var(--text-muted)] transition hover:text-[var(--text)] hover:scale-105 cursor-pointer"
         aria-label="Close"
       >
         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -27,7 +27,7 @@
               v-if="pin"
               :src="pin.image_url"
               :alt="pin.title"
-              class="max-h-[70vh] w-auto max-w-full rounded-lg object-contain"
+              class="max-h-[70vh] w-auto max-w-full rounded-2xl object-contain shadow-[var(--shadow-lg)]"
             />
             <div v-else class="h-10 w-10 animate-spin rounded-full border-4 border-[var(--panel-border)] border-t-[var(--accent)]"></div>
           </div>
@@ -39,8 +39,8 @@
 
           <template v-else-if="pin">
             <!-- Heading -->
-            <p class="text-xs font-semibold uppercase tracking-wider text-[var(--accent)]">{{ pin.category || 'Uncategorised' }}</p>
-            <h1 class="mt-1 pr-10 text-2xl font-bold leading-tight tracking-tight text-[var(--text)]">{{ pin.title }}</h1>
+            <p class="w-fit rounded-full bg-[var(--accent-soft)] px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[var(--accent)]">{{ pin.category || 'Uncategorised' }}</p>
+            <h1 class="mt-3 pr-10 font-outfit text-3xl font-bold leading-tight tracking-tight text-[var(--text)]">{{ pin.title }}</h1>
 
             <!-- Author -->
             <div class="mt-4 flex items-center gap-3">
@@ -61,7 +61,7 @@
                 type="button"
                 @click="toggleLike"
                 :aria-pressed="!!pin.is_liked"
-                class="flex h-10 items-center justify-center gap-2 rounded-lg border border-[var(--panel-border)] text-sm font-medium text-[var(--text)] hover:bg-[var(--bg)]"
+                class="flex h-11 items-center justify-center gap-2 rounded-xl border border-[var(--panel-border)] text-sm font-semibold text-[var(--text)] transition hover:bg-[var(--bg)] cursor-pointer"
               >
                 <svg class="h-4.5 w-4.5" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" :class="pin.is_liked ? 'fill-red-500 stroke-red-500' : 'fill-none'">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
@@ -72,7 +72,7 @@
                 type="button"
                 @click="toggleFavorite"
                 :aria-pressed="!!pin.is_favorited"
-                class="flex h-10 items-center justify-center gap-2 rounded-lg border text-sm font-medium hover:bg-[var(--bg)]"
+                class="flex h-11 items-center justify-center gap-2 rounded-xl border text-sm font-semibold transition hover:bg-[var(--bg)] cursor-pointer"
                 :class="pin.is_favorited ? 'border-amber-400 text-amber-600' : 'border-[var(--panel-border)] text-[var(--text)]'"
               >
                 <svg class="h-4.5 w-4.5" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" :class="pin.is_favorited ? 'fill-amber-400 stroke-amber-500' : 'fill-none'">
@@ -83,19 +83,22 @@
             </div>
 
             <div class="mt-2 flex gap-2">
-              <select
-                v-model="selectedBoardId"
-                aria-label="Choose a board"
-                class="h-10 min-w-0 flex-1 rounded-lg border border-[var(--panel-border)] bg-[var(--bg-soft)] px-3 text-sm text-[var(--text)]"
-              >
-                <option :value="null" disabled>{{ boards.length ? 'Choose a board' : 'No boards yet' }}</option>
-                <option v-for="board in boards" :key="board.id" :value="board.id">{{ board.name }}</option>
-              </select>
+              <div class="relative min-w-0 flex-1">
+                <select
+                  v-model="selectedBoardId"
+                  :disabled="!boards.length"
+                  aria-label="Choose a board"
+                  class="h-11 w-full appearance-none rounded-xl border border-[var(--panel-border)] bg-[var(--bg-soft)] pl-3.5 text-sm text-[var(--text)]"
+                >
+                  <option :value="null" disabled>{{ boards.length ? 'Choose a board' : 'No boards yet' }}</option>
+                  <option v-for="board in boards" :key="board.id" :value="board.id" class="bg-white text-black">{{ board.name }}</option>
+                </select>
+              </div>
               <button
                 type="button"
                 @click="saveToBoard"
                 :disabled="selectedBoardId === null && !isSaved"
-                class="h-10 shrink-0 rounded-lg bg-[var(--accent)] px-5 text-sm font-semibold text-white hover:bg-[var(--accent-hover)] disabled:opacity-50"
+                class="h-11 shrink-0 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-6 text-sm font-bold text-white shadow-md shadow-emerald-500/25 transition hover:from-emerald-400 hover:to-teal-400 disabled:opacity-50 disabled:shadow-none cursor-pointer"
               >
                 {{ saveBtnText }}
               </button>
@@ -105,7 +108,7 @@
               type="button"
               @click="downloadFullImage"
               :disabled="isDownloading"
-              class="mt-2 flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-[var(--panel-border)] text-sm font-medium text-[var(--text)] hover:bg-[var(--bg)] disabled:opacity-60"
+              class="mt-2 flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-[var(--panel-border)] text-sm font-semibold text-[var(--text)] transition hover:bg-[var(--bg)] disabled:opacity-60 cursor-pointer"
             >
               <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
@@ -120,7 +123,7 @@
                 :key="tag"
                 type="button"
                 @click="$emit('tag-click', tag)"
-                class="rounded-md bg-[var(--bg)] px-2.5 py-1 text-xs text-[var(--text-muted)] hover:text-[var(--accent)]"
+                class="rounded-full bg-[var(--bg)] border border-[var(--panel-border)] px-3 py-1 text-xs font-medium text-[var(--text-muted)] transition hover:text-[var(--accent)] hover:border-[var(--accent)] cursor-pointer"
               >
                 #{{ tag }}
               </button>
