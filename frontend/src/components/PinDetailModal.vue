@@ -184,7 +184,7 @@
             class="group overflow-hidden rounded-lg border border-[var(--panel-border)] bg-[var(--bg-soft)] text-left hover:border-[var(--accent)]"
           >
             <div class="aspect-4/3 overflow-hidden bg-[var(--bg)]">
-              <img :src="sim.image_url" :alt="sim.title" @error="hideBrokenImage" class="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
+              <img :src="sim.thumb_url || sim.image_url" :alt="sim.title" loading="lazy" decoding="async" @error="hideBrokenImage" class="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
             </div>
             <div class="p-3">
               <p class="line-clamp-1 text-sm font-medium text-[var(--text)]">{{ sim.title }}</p>
@@ -201,8 +201,8 @@
 </template>
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { downloadImage } from '../utils/download'
-import { showToast } from '../utils/toast'
+import { downloadImage } from '../services/download'
+import { showToast } from '../composables/useToast'
 
 const props = defineProps<{
   pinId: number
@@ -246,7 +246,7 @@ onMounted(async () => {
 async function loadPinDetails(id: number) {
   isLoading.value = true
   try {
-    const pinRes = await fetch(`/api/pins/${id}?user_id=${props.currentUserId}`)
+    const pinRes = await fetch(`/api/pins/${id}`)
     if (!pinRes.ok) throw new Error('Pin details load failed')
     const data = await pinRes.json()
     pin.value = data.pin

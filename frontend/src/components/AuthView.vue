@@ -43,13 +43,31 @@
 
         <div class="flex flex-col gap-1.5">
           <label class="text-xs font-medium text-[var(--text-muted)]">Password</label>
-          <input 
-            type="password" 
-            placeholder="Your password" autocomplete="current-password" 
-            v-model="password"
-            required
-            class="w-full rounded-xl border border-[var(--panel-border)] bg-[var(--bg)] px-4 py-3 text-sm text-[var(--text)] outline-none focus:border-[var(--accent)] transition"
-          />
+          <div class="relative">
+            <input
+              :type="showPassword ? 'text' : 'password'"
+              placeholder="Your password" autocomplete="current-password"
+              v-model="password"
+              required
+              class="w-full rounded-xl border border-[var(--panel-border)] bg-[var(--bg)] py-3 pl-4 pr-12 text-sm text-[var(--text)] outline-none focus:border-[var(--accent)] transition"
+            />
+            <button
+              type="button"
+              @click="showPassword = !showPassword"
+              class="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-[var(--text-muted)] transition hover:text-[var(--text)] cursor-pointer"
+              :aria-label="showPassword ? 'Hide password' : 'Show password'"
+              :aria-pressed="showPassword"
+              :title="showPassword ? 'Hide password' : 'Show password'"
+            >
+              <svg v-if="showPassword" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+              </svg>
+              <svg v-else class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         <button 
@@ -80,13 +98,31 @@
 
         <div class="flex flex-col gap-1.5">
           <label class="text-xs font-medium text-[var(--text-muted)]">Password</label>
-          <input 
-            type="password" 
-            placeholder="Create a password" autocomplete="new-password" 
-            v-model="password"
-            required
-            class="w-full rounded-xl border border-[var(--panel-border)] bg-[var(--bg)] px-4 py-3 text-sm text-[var(--text)] outline-none focus:border-[var(--accent)] transition"
-          />
+          <div class="relative">
+            <input
+              :type="showPassword ? 'text' : 'password'"
+              placeholder="At least 8 characters" autocomplete="new-password"
+              v-model="password"
+              required minlength="8" maxlength="128"
+              class="w-full rounded-xl border border-[var(--panel-border)] bg-[var(--bg)] py-3 pl-4 pr-12 text-sm text-[var(--text)] outline-none focus:border-[var(--accent)] transition"
+            />
+            <button
+              type="button"
+              @click="showPassword = !showPassword"
+              class="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-[var(--text-muted)] transition hover:text-[var(--text)] cursor-pointer"
+              :aria-label="showPassword ? 'Hide password' : 'Show password'"
+              :aria-pressed="showPassword"
+              :title="showPassword ? 'Hide password' : 'Show password'"
+            >
+              <svg v-if="showPassword" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+              </svg>
+              <svg v-else class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         <div class="flex flex-col gap-1.5">
@@ -180,6 +216,7 @@ const emit = defineEmits<{
 const isLoginView = ref(true)
 const username = ref('')
 const password = ref('')
+const showPassword = ref(false)
 const bio = ref('')
 const avatar = ref('')
 const isLoading = ref(false)
@@ -202,7 +239,7 @@ function toggleAuthView() {
 }
 
 async function handleLogin() {
-  if (!username.value.trim() || !password.value.trim()) return
+  if (!username.value.trim() || !password.value) return
 
   isLoading.value = true
   errorMsg.value = ''
@@ -213,7 +250,7 @@ async function handleLogin() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         username: username.value.trim(),
-        password: password.value.trim()
+        password: password.value
       })
     })
 
@@ -230,8 +267,18 @@ async function handleLogin() {
   }
 }
 
+const USERNAME_RE = /^[\p{L}\p{N} ._-]{3,50}$/u
+
 async function handleRegister() {
-  if (!username.value.trim() || !password.value.trim()) return
+  if (!username.value.trim() || !password.value) return
+  if (!USERNAME_RE.test(username.value.trim())) {
+    errorMsg.value = 'Username must be 3-50 characters: letters, numbers, spaces, dots, dashes or underscores.'
+    return
+  }
+  if (password.value.length < 8) {
+    errorMsg.value = 'Password must be at least 8 characters.'
+    return
+  }
 
   isLoading.value = true
   errorMsg.value = ''
@@ -242,7 +289,7 @@ async function handleRegister() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         username: username.value.trim(),
-        password: password.value.trim(),
+        password: password.value,
         avatar: avatar.value.trim() || null,
         bio: bio.value.trim()
       })

@@ -199,6 +199,10 @@
           {{ errorMsg }}
         </div>
 
+        <div v-if="isSubmitting" class="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-[var(--panel-border)]" role="progressbar" :aria-valuenow="uploadProgress" aria-valuemin="0" aria-valuemax="100" aria-label="Upload progress">
+          <div class="h-full rounded-full bg-[var(--accent)] transition-all duration-200" :style="{ width: uploadProgress + '%' }"></div>
+        </div>
+
         <!-- Submit Buttons -->
         <div class="mt-6 flex justify-end gap-3 border-t border-[var(--panel-border)] pt-5">
           <button 
@@ -218,7 +222,7 @@
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            {{ isSubmitting ? 'Uploading...' : 'Publish Pin' }}
+            {{ isSubmitting ? (uploadProgress > 0 && uploadProgress < 100 ? `Uploading ${uploadProgress}%` : 'Processing...') : 'Publish Pin' }}
           </button>
         </div>
       </form>
@@ -255,6 +259,7 @@
 </template>
 
 <script setup lang="ts">
+import { uploadWithProgress } from '../services/upload'
 import { computed, ref } from 'vue'
 
 const props = defineProps<{
@@ -286,6 +291,7 @@ const dragOver = ref(false)
 
 // UI states
 const isSubmitting = ref(false)
+const uploadProgress = ref(0)
 const isSuccess = ref(false)
 const errorMsg = ref('')
 
@@ -397,7 +403,6 @@ async function submitPin() {
     formData.append('description', description.value.trim())
     formData.append('category', category.value)
     formData.append('tags', tags.value.trim())
-    formData.append('user_id', props.currentUserId.toString())
     
     if (boardId.value !== null) {
       formData.append('board_id', boardId.value.toString())
@@ -409,14 +414,10 @@ async function submitPin() {
       formData.append('image_url', imageUrl.value.trim())
     }
 
-    const response = await fetch('/api/pins', {
-      method: 'POST',
-      body: formData // Sends multi-part body with file
-    })
-
-    const data = await response.json()
-    if (!response.ok) {
-      throw new Error(data.error || 'Server error uploading pin')
+    uploadProgress.value = 0
+    const { status, data } = await uploadWithProgress('/api/pins', formData, percent => { uploadProgress.value = percent })
+    if (status < 200 || status >= 300) {
+      throw new Error(data?.error || (status === 401 ? 'Please sign in again.' : 'Server error uploading pin'))
     }
 
     isSuccess.value = true

@@ -6,9 +6,10 @@
     <!-- Image Wrapper with Rounded Corners & Premium Shadows -->
     <div class="relative overflow-hidden w-full rounded-2xl bg-slate-200 dark:bg-zinc-800 shadow-[var(--shadow)] group-hover:shadow-[var(--shadow-lg)] transition-all duration-500 ring-1 ring-inset ring-black/5 dark:ring-white/5">
       <img 
-        :src="pin.image_url" 
+        :src="pin.thumb_url || pin.image_url" 
         :alt="pin.title"
         loading="lazy"
+        decoding="async"
         class="w-full h-auto object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02]"
       />
 
@@ -131,13 +132,14 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { downloadImage } from '../utils/download'
+import { downloadImage } from '../services/download'
 
 const props = defineProps<{
   pin: {
     id: number
     title: string
     image_url: string
+    thumb_url?: string | null
     category?: string
     tags?: string
     username: string

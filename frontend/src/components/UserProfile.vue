@@ -117,7 +117,7 @@
               @click="$emit('click-pin', pin.id)"
               class="group mb-5 break-inside-avoid overflow-hidden rounded-2xl bg-[var(--bg-soft)] border border-[var(--panel-border)] shadow-sm hover:shadow-md transition cursor-pointer"
             >
-              <img :src="pin.image_url" :alt="pin.title" class="w-full h-auto object-cover group-hover:opacity-90 transition" />
+              <img :src="pin.thumb_url || pin.image_url" :alt="pin.title" loading="lazy" decoding="async" class="w-full h-auto object-cover group-hover:opacity-90 transition" />
               <div class="p-3">
                 <h4 class="text-xs font-bold text-[var(--text)] line-clamp-1 leading-snug">{{ pin.title }}</h4>
                 <span class="text-[10px] text-[var(--text-muted)] mt-1 block">♥ {{ pin.likes_count || 0 }} likes</span>
@@ -145,7 +145,7 @@
               @click="$emit('click-pin', pin.id)"
               class="group mb-5 break-inside-avoid overflow-hidden rounded-2xl bg-[var(--bg-soft)] border border-[var(--panel-border)] shadow-sm hover:shadow-md transition cursor-pointer"
             >
-              <img :src="pin.image_url" :alt="pin.title" class="w-full h-auto object-cover group-hover:opacity-90 transition" />
+              <img :src="pin.thumb_url || pin.image_url" :alt="pin.title" loading="lazy" decoding="async" class="w-full h-auto object-cover group-hover:opacity-90 transition" />
               <div class="p-3">
                 <h4 class="text-xs font-bold text-[var(--text)] line-clamp-1 leading-snug">{{ pin.title }}</h4>
                 <span class="text-[10px] text-[var(--text-muted)] mt-1 block">by {{ pin.username }}</span>
@@ -172,7 +172,7 @@
               @click="$emit('click-pin', pin.id)"
               class="group mb-5 break-inside-avoid overflow-hidden rounded-2xl bg-[var(--bg-soft)] border border-[var(--panel-border)] shadow-sm hover:shadow-md transition cursor-pointer"
             >
-              <img :src="pin.image_url" :alt="pin.title" class="w-full h-auto object-cover group-hover:opacity-90 transition" />
+              <img :src="pin.thumb_url || pin.image_url" :alt="pin.title" loading="lazy" decoding="async" class="w-full h-auto object-cover group-hover:opacity-90 transition" />
               <div class="p-3">
                 <h4 class="text-xs font-bold text-[var(--text)] line-clamp-1 leading-snug">{{ pin.title }}</h4>
                 <span class="text-[10px] text-[var(--text-muted)] mt-1 block">♥ {{ pin.likes_count || 0 }} likes</span>
@@ -207,6 +207,7 @@
                   v-if="board.cover_url"
                   :src="board.cover_url"
                   :alt="board.name"
+                  loading="lazy"
                   class="h-full w-full object-cover group-hover:scale-105 transition duration-300"
                 />
                 <div v-else class="h-full w-full flex items-center justify-center text-[var(--text-muted)] bg-slate-100 dark:bg-zinc-800">

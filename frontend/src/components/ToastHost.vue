@@ -23,5 +23,5 @@
 </template>
 
 <script setup lang="ts">
-import { toasts, dismissToast } from '../utils/toast'
+import { toasts, dismissToast } from '../composables/useToast'
 </script>

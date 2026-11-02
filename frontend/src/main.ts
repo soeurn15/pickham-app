@@ -1,24 +1,22 @@
 import './assets/main.css'
 import { createApp } from 'vue'
+import { createPinia } from 'pinia'
 import App from './App.vue'
+import router from './router'
+import { installHttp } from './services/http'
+import { useSessionStore } from './stores/session'
+import { useUiStore } from './stores/ui'
 
-// Attach the session token to every API call, and drop the session if the server rejects it
-const nativeFetch = window.fetch.bind(window)
-window.fetch = async (input, init) => {
-  const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
-  if (!url.startsWith('/api/')) return nativeFetch(input, init)
+const app = createApp(App)
+app.use(createPinia())
+app.use(router)
 
-  const headers = new Headers(init?.headers)
-  const token = localStorage.getItem('vivid_token')
-  if (token) headers.set('Authorization', `Bearer ${token}`)
+useUiStore().initTheme()
 
-  const response = await nativeFetch(input, { ...init, headers })
-  if (response.status === 401 && !url.startsWith('/api/auth/') && token) {
-    localStorage.removeItem('vivid_token')
-    localStorage.removeItem('vivid_user')
-    window.location.reload()
-  }
-  return response
-}
+// A rejected token (expired, account deleted) signs the user out and returns them to the login page
+installHttp(() => {
+  useSessionStore().signOut()
+  router.push({ name: 'login' })
+})
 
-createApp(App).mount('#app')
+app.mount('#app')

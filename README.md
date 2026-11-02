@@ -8,25 +8,19 @@ A Pinterest-style content sharing app: post images ("pins"), organise them into 
 ## Project structure
 
 ```
-Avora/
-├─ frontend/             The website
-│  ├─ src/
-│  │  ├─ components/     One file per screen or widget
-│  │  ├─ utils/          Shared helpers (toast, download)
-│  │  ├─ assets/         Theme colours and global styles
-│  │  ├─ App.vue         Main state and navigation
-│  │  └─ main.ts         App start-up
-│  ├─ public/            Static files
-│  ├─ index.html
-│  └─ vite.config.ts     Dev server; forwards /api to the backend
-├─ backend/              The API  (see backend/README.md)
-│  ├─ routes/  middleware/  config/  db/  utils/
-│  ├─ index.js  app.js
-│  ├─ .env               Your private settings (never committed)
-│  └─ .env.example       Template for .env
-├─ package.json          Runs both apps (npm workspaces)
-└─ README.md
+content-project/
+├─ frontend/                 The website (Vue 3, Vite, Tailwind, Pinia, Vue Router)
+│  └─ src/  assets/ components/ layouts/ pages/ router/ stores/ services/ composables/ types/
+├─ backend/                  The API (Express 5, MySQL)
+│  ├─ src/  config/ routes/ controllers/ services/ repositories/ middleware/ validators/ utils/ db/
+│  ├─ scripts/backup.js      Database + uploads backup
+│  ├─ .env.example           Template for your private .env
+│  └─ uploads/               Uploaded images and thumbnails (not committed)
+├─ docs/                     architecture.md, database.md, api.md
+└─ package.json              Runs both apps (npm workspaces)
 ```
+
+Read `docs/architecture.md` for how a request flows and how the app is secured.
 
 ## Setup (first time)
 
@@ -40,9 +34,9 @@ Avora/
    ```sh
    copy backend\.env.example backend\.env
    ```
-   Open `backend/.env` and fill in your MySQL password and a long random `JWT_SECRET`.
+   Open `backend/.env`, fill in your MySQL password and set `JWT_SECRET` (at least 32 random characters; the file explains how to generate one).
 
-Tables are created automatically on first start, with demo data (users `Aqeel`, `Zara Chen`, ... all with password `password`).
+Tables are created automatically on first start, with demo data in development (users `Aqeel`, `Zara Chen`, ... all with password `password`). Demo data is off when `NODE_ENV=production`.
 
 ## Run
 
@@ -63,8 +57,11 @@ Run them separately if you prefer:
 
 ## Security notes
 
-- Passwords are hashed (scrypt). Old plaintext passwords are upgraded on the user's next login.
-- Every `/api` route except login, register and health needs the bearer token returned at login; `/api/admin/*` also needs the `admin` role.
-- Login and sign-up are rate limited.
+- Passwords are hashed with scrypt; accounts need 8+ character passwords. Passwords stored in plaintext by old versions are hashed automatically on the next start.
+- Every `/api` route except login, register and health needs the bearer token; `/api/admin/*` also needs the `admin` role.
+- All input is validated; uploads are verified as real images, stripped of metadata and thumbnailed.
+- Login, sign-up, uploads and the API overall are rate limited. CORS only allows the origins in `CORS_ORIGINS`.
 - To make a user admin: `UPDATE users SET role = 'admin' WHERE username = 'Aqeel';`
-- Change the demo passwords before putting this anywhere public.
+- **Before going public:** set `NODE_ENV=production`, a strong `JWT_SECRET`, `CORS_ORIGINS`, `TRUST_PROXY`, serve over HTTPS, change or remove demo accounts, and schedule `npm run db:backup -w backend`.
+
+See `docs/architecture.md` for the full list and the known limits.
